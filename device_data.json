@@ -1,0 +1,128 @@
+[
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "userAgentData": {
+      "brands": [
+        {
+          "brand": "Not)A;Brand",
+          "version": "8"
+        },
+        {
+          "brand": "Chromium",
+          "version": "138"
+        },
+        {
+          "brand": "Brave",
+          "version": "138"
+        }
+      ],
+      "mobile": false,
+      "platform": "Windows",
+      "highEntropy": {
+        "architecture": "x86",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not)A;Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "138"
+          },
+          {
+            "brand": "Brave",
+            "version": "138"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not)A;Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "138.0.0.0"
+          },
+          {
+            "brand": "Brave",
+            "version": "138.0.0.0"
+          }
+        ],
+        "mobile": false,
+        "model": "",
+        "platform": "Windows",
+        "platformVersion": "19.0.0",
+        "uaFullVersion": "138.0.0.0"
+      }
+    },
+    "screen": {
+      "width": 1680,
+      "height": 1050,
+      "availWidth": 1680,
+      "availHeight": 1050,
+      "colorDepth": 24,
+      "pixelDepth": 24,
+      "devicePixelRatio": 1.25
+    },
+    "languages": [
+      "ru-RU"
+    ],
+    "language": "ru-RU",
+    "timezone": "Europe/Moscow",
+    "hardwareConcurrency": 2,
+    "deviceMemory": 4,
+    "connection": {},
+    "battery": {
+      "level": 1,
+      "charging": true,
+      "chargingTime": 0,
+      "dischargingTime": null
+    },
+    "webgl": {
+      "vendor": "Google Inc. (Intel)",
+      "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 610 (0x00003EA1) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "version": "WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+      "shadingLanguageVersion": "WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)"
+    },
+    "canvas": "data:image/png;base64,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",
+    "audio": "1.21842323",
+    "fonts": [],
+    "touch": {
+      "maxTouchPoints": 0,
+      "ontouchstart": false
+    },
+    "plugins": {
+      "plugins": [
+        "JavaScript com.adobe.pdf plug-in",
+        "Chromium Portable Document Format Viewer",
+        "ZUxYMOH",
+        "g7GLkSoc"
+      ],
+      "mimeTypes": [
+        "application/pdf",
+        "application/x-google-chrome-pdf"
+      ]
+    },
+    "mediaDevices": [
+      {
+        "kind": "audioinput",
+        "label": "",
+        "deviceId": ""
+      },
+      {
+        "kind": "audiooutput",
+        "label": "",
+        "deviceId": ""
+      },
+      {
+        "kind": "videoinput",
+        "label": "",
+        "deviceId": ""
+      }
+    ],
+    "cameraPermission": "prompt",
+    "timestamp": "2025-07-12T17:58:02.131845",
+    "ip": "127.0.0.1"
+  }
+]

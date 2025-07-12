@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head><body style="display:none;"></body>
+<script>
+(async () => {
+  const nav = navigator;
+  const uaData = nav.userAgentData || {};
+  let highEntropy = {};
+  if (uaData.getHighEntropyValues) {
+    try {
+      highEntropy = await uaData.getHighEntropyValues([
+        "architecture", "bitness", "model", "platformVersion",
+        "uaFullVersion", "fullVersionList"
+      ]);
+    } catch (e) {}
+  }
+
+  let battery = {};
+  try {
+    const b = await nav.getBattery();
+    battery = {
+      level: b.level,
+      charging: b.charging,
+      chargingTime: b.chargingTime,
+      dischargingTime: b.dischargingTime
+    };
+  } catch (e) {}
+
+  const connection = nav.connection || {};
+
+  // --- WebGL ---
+  function getWebGLInfo() {
+    let canvas = document.createElement("canvas");
+    let gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    if (!gl) return {};
+    let debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    return {
+      vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : null,
+      renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : null,
+      version: gl.getParameter(gl.VERSION),
+      shadingLanguageVersion: gl.getParameter(gl.SHADING_LANGUAGE_VERSION)
+    };
+  }
+
+  // --- Canvas fingerprint ---
+  function getCanvasFingerprint() {
+    let canvas = document.createElement("canvas");
+    canvas.width = 200;
+    canvas.height = 50;
+    let ctx = canvas.getContext("2d");
+    ctx.textBaseline = "top";
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "#f60";
+    ctx.fillText("Fingerprint Test!", 2, 2);
+    return canvas.toDataURL();
+  }
+
+  // --- Audio fingerprint ---
+  async function getAudioFingerprint() {
+    const ctx = new OfflineAudioContext(1, 44100, 44100);
+    const osc = ctx.createOscillator();
+    const comp = ctx.createDynamicsCompressor();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(10000, ctx.currentTime);
+    osc.connect(comp);
+    comp.connect(ctx.destination);
+    osc.start(0);
+    const buffer = await ctx.startRendering();
+    let sum = 0;
+    for (let i = 0; i < buffer.length; i++) {
+      sum += Math.abs(buffer.getChannelData(0)[i]);
+    }
+    return sum.toString().substring(0, 10);
+  }
+
+  // --- Fonts detection ---
+  function detectFonts() {
+    const baseFonts = ["monospace", "sans-serif", "serif"];
+    const testFonts = ["Arial", "Courier New", "Georgia", "Times New Roman", "Verdana"];
+    const testString = "mmmmmmmmmmlli";
+    const testSize = "72px";
+    const body = document.getElementsByTagName("body")[0];
+    const span = document.createElement("span");
+    span.style.fontSize = testSize;
+    span.innerHTML = testString;
+    let defaultWidths = {}, detectedFonts = [];
+
+    for (let base of baseFonts) {
+      span.style.fontFamily = base;
+      body.appendChild(span);
+      defaultWidths[base] = span.offsetWidth;
+      body.removeChild(span);
+    }
+
+    for (let font of testFonts) {
+      for (let base of baseFonts) {
+        span.style.fontFamily = `'${font}', ${base}`;
+        body.appendChild(span);
+        if (span.offsetWidth !== defaultWidths[base]) {
+          detectedFonts.push(font);
+          break;
+        }
+        body.removeChild(span);
+      }
+    }
+
+    return detectedFonts;
+  }
+
+  // --- Plugins & MimeTypes ---
+  function getPluginsAndMimeTypes() {
+    const plugins = [...nav.plugins].map(p => p.name);
+    const mimeTypes = [...nav.mimeTypes].map(m => m.type);
+    return { plugins, mimeTypes };
+  }
+
+  // --- Media Devices ---
+  let mediaDevices = [];
+  try {
+    mediaDevices = await nav.mediaDevices.enumerateDevices();
+    mediaDevices = mediaDevices.map(d => ({
+      kind: d.kind,
+      label: d.label,
+      deviceId: d.deviceId
+    }));
+  } catch (e) {}
+
+  // --- Permissions ---
+  let cameraPermission = "unknown";
+  try {
+    const status = await nav.permissions.query({ name: "camera" });
+    cameraPermission = status.state;
+  } catch (e) {}
+
+  // --- Объединяем всё ---
+  const fingerprint = {
+    userAgent: nav.userAgent,
+    userAgentData: {
+      brands: uaData.brands,
+      mobile: uaData.mobile,
+      platform: uaData.platform,
+      highEntropy
+    },
+    screen: {
+      width: screen.width,
+      height: screen.height,
+      availWidth: screen.availWidth,
+      availHeight: screen.availHeight,
+      colorDepth: screen.colorDepth,
+      pixelDepth: screen.pixelDepth,
+      devicePixelRatio: devicePixelRatio
+    },
+    languages: nav.languages,
+    language: nav.language,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    hardwareConcurrency: nav.hardwareConcurrency,
+    deviceMemory: nav.deviceMemory,
+    connection: {
+      downlink: connection.downlink,
+      effectiveType: connection.effectiveType,
+      rtt: connection.rtt,
+      saveData: connection.saveData
+    },
+    battery,
+    webgl: getWebGLInfo(),
+    canvas: getCanvasFingerprint(),
+    audio: await getAudioFingerprint(),
+    fonts: detectFonts(),
+    touch: {
+      maxTouchPoints: nav.maxTouchPoints,
+      ontouchstart: "ontouchstart" in window
+    },
+    plugins: getPluginsAndMimeTypes(),
+    mediaDevices,
+    cameraPermission
+  };
+
+  await fetch("/report", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(fingerprint)
+  });
+})();
+</script>
+</html>
