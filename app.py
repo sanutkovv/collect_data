@@ -30,5 +30,12 @@ def report():
         f.truncate()
     return {"status": "ok"}
 
+@app.route("/dump")
+def dump_data():
+    with open(DATA_FILE) as f:
+        data = json.load(f)
+    return {"data": data}
+
+
 if __name__ == "__main__":
     app.run()
